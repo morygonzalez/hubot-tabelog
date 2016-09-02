@@ -4,6 +4,8 @@
 # Configuration:
 #   HUBOT_TIMEZONE_OFFSET (optional)
 #     timezone offset if you want to use a specific timezone
+#   HUBOT_TABELOG_ONLY_URL
+#     post only URL if set to 1
 #
 # Commands:
 #   hubot tabelog (<lunch|dinner>) for <keyword> in <area> - pick up a restaurant with the keyword in the area
@@ -63,12 +65,15 @@ module.exports = (robot) ->
       restaurant = _.sample(restaurants, 1)[0]
       console.log restaurant
       if restaurant
-        messages = []
-        messages.push restaurant.name
-        if restaurant.stars? and restaurant.stars != '' and restaurant.score? and restaurant.score != ''
-          messages.push restaurant.stars + ' ' + formatScore(restaurant.score)
-        messages.push restaurant.link
-        message = messages.join("\n")
+        if process.env.HUBOT_TABELOG_ONLY_URL == '1'
+          message = restaurant.link
+        else
+          messages = []
+          messages.push restaurant.name
+          if restaurant.stars? and restaurant.stars != '' and restaurant.score? and restaurant.score != ''
+            messages.push restaurant.stars + ' ' + formatScore(restaurant.score)
+          messages.push restaurant.link
+          message = messages.join("\n")
       msg.send restaurant.image, message
 
   endpoint   = 'http://tabelog.com/'
